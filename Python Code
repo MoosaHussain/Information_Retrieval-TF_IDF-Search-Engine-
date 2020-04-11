@@ -1,963 +1,583 @@
 
 # Author MoosaHussain 
-2
 #Date of Submission 10/4/2020
-3
 ​
-4
 ​
-5
 import numpy as numpy
-6
-import numpy as numpy
-7
 import nltk
-8
 from nltk.stem import WordNetLemmatizer 
-9
 from os import listdir
-10
 from os.path import isfile, join
-11
 import re
-12
 from nltk.stem import PorterStemmer 
-13
 global N 
-14
 N = 56
-15
 unique_words_all = []
-16
 ​
-17
 def Term_Frequency(words):
-18
     words_unique = []
-19
     word_freq = {}
-20
     for word in words:
-21
         if word not in words_unique:
-22
             words_unique.append(word)
-23
     sor_uni = sorted(words_unique)
-24
     for word in sor_uni:
-25
         word_freq[word] = words.count(word)
-26
     return word_freq
-27
 ​
-28
 def lemma(words):
-29
     
-30
     lemmatizer = WordNetLemmatizer()
-31
     wo =[]
-32
     for word in words:
-33
         wo.append(lemmatizer.lemmatize(word))
-34
     return(wo) 
-35
     
-36
 ​
-37
     
-38
 def getunique(list):
-39
     unlist = []
-40
     for x in list:
-41
         if x not in unlist:
-42
             unlist.append(x)
-43
     return(unlist)        
-44
 ​
-45
 ​
-46
                                 # Initializing the Model 
-47
 ​
-48
 word_freq_in_doc = {}
-49
 dict = {}
-50
 idx = 0
-51
 doc=[]
-52
 files=[]
-53
 NewList=[]
-54
 Total_Vocab =[]
-55
                     # Loading stop Words and Files Needed for the Processing 
-56
 files =['speech_0.txt', 'speech_1.txt','speech_2.txt','speech_3.txt','speech_4.txt','speech_5.txt','speech_6.txt','speech_7.txt','speech_8.txt','speech_9.txt','speech_10.txt','speech_11.txt','speech_12.txt','speech_13.txt','speech_14.txt','speech_15.txt','speech_16.txt','speech_17.txt','speech_18.txt','speech_19.txt','speech_20.txt','speech_21.txt','speech_22.txt','speech_23.txt','speech_24.txt','speech_25.txt','speech_26.txt','speech_27.txt','speech_28.txt','speech_29.txt','speech_30.txt','speech_31.txt','speech_32.txt','speech_33.txt','speech_34.txt','speech_35.txt','speech_36.txt','speech_37.txt','speech_38.txt','speech_39.txt','speech_40.txt','speech_41.txt','speech_42.txt','speech_43.txt','speech_44.txt','speech_45.txt','speech_46.txt','speech_47.txt','speech_48.txt','speech_49.txt','speech_50.txt','speech_51.txt','speech_52.txt','speech_53.txt','speech_54.txt','speech_55.txt']
-57
 with open('Stopword-List.txt') as u : 
-58
     Stopwords = u.read().split()
-59
                     #Looping through Each File in the Directory 
-60
                     
-61
                 #Pre Processing the Files 
-62
 for file in files:
-63
     file = open(file, "r")
-64
     words = file.read().split()
-65
     stri = ' '.join(words) 
-66
     words = re.sub("[^A-Za-z0-9]+"," ",stri)
-67
     words = words.split()
-68
     words = [word for word in words if len(words)>1]
-69
                 # Case Folding 
-70
     words = [word.lower() for word in words]
-71
             # Stop Words Removal        
-72
     words = [word for word in words if word not in Stopwords]
-73
                 # Lemmatization     
-74
     words = lemma(words)
-75
     doc.append(words)
-76
     r = Term_Frequency(words)
-77
     
-78
             #Formation of Index 
-79
     word_freq_in_doc = getunique(words)
-80
          
-81
     for word in  word_freq_in_doc:
-82
 ​
-83
         NewList.append([word,idx,r[word]])
-84
         
-85
         
-86
         Total_Vocab.append(word)
-87
     idx = idx + 1 
-88
 total_unique_words = getunique(Total_Vocab)
-89
 print(N)
-90
 ​
-91
 Finalise_List = NewList
-92
 ​
-93
 ​
-1
 ​
-2
 #                                Save the Index in File 
-3
 with open('Index_Doc.txt',"w") as index:
-4
     for f in Finalise_List:
-5
         index.write('%s\n'% f )
-6
     index.close()
-1
 #                                   Load the Index From File 
-2
 Final_List=[]
-3
 with open('Index_Doc.txt',"r") as Final_Index:
-4
     Final_List=Final_Index.readlines()
-1
 import math
-2
 #                       Helper Functions For Further Processsing 
-3
 #                        Doc_Frequency
-4
-​
-5
+
 def Doc_frequency(q):
-6
     
-7
     Doc_Frequency = {}
-8
     check = 0 
-9
     for f in Finalise_List :
-10
 #        print(f[0])
-11
         if f[0] ==  q :
-12
             check =check + 1
-13
  #           print(check)
-14
     return(check) 
-15
-​
-16
-​
-17
+
+
 #Inverse_Doc_Frequency
-18
 def Inverse_Doc_Frequency(doc_fre):
-19
     N = 56
-20
     Inverse_Doc_Frequency= math.log10((int(doc_fre))/N)
-21
     return(Inverse_Doc_Frequency)
-22
-​
-23
+
 def doc_list(word):
-24
     c = 0 
-25
     l=[]
-26
     
-27
     for i in doc :
-28
         for j in i:
-29
             if j == word :
-30
                 l.append(1)
-31
                 o = 1
-32
                 break
-33
                 
-34
         if 0 == 0 :
-35
             l.append(0)
-36
         o=0
-37
         c = c+1
-38
     return(l)    
-39
         
-40
 def Term_Freq_Doc(term,doc_id):
-41
     i=0
-42
     list_f=[]
-43
     for f in doc:
-44
         if i== doc_id :
-45
             list_f = f 
-46
         i=i+1   
-47
     term_freq = Term_Frequency(list_f)       
-48
    # print(term_freq)
-49
    # y=term_freq[term]    
-50
     l=0
-51
     for i in term_freq :
-52
         if i == term :
-53
             l=term_freq[i]
-54
             break
-55
     return(l)
-56
-​
-57
+
     
-58
 def TF_IDF(tf,idf):
-59
     return(tf*idf)
-60
-​
-61
-​
-62
+
+
 def Doc_freq(Finalise_List):
-63
     
-64
     Doc_Frequency = {}
-65
     check = 0 
-66
     for f in Finalise_List :
-67
         for i in Finalise_List :
-68
             if f[0] ==  i[0] :
-69
                 check =check + 1
-70
                 
-71
         Doc_Frequency[f[0]] = check 
-72
         check = 0
-73
          
-74
     
-75
     return(Doc_Frequency) 
-76
 #IDF For Documents 
-77
-​
-78
+
 def Inverse_Doc_Freq(doc_fre):
-79
     Inverse_Doc_Frequency = {}
-80
     check = 0 
-81
 #print(doc_fre)
-82
     N=56
-83
     for f in Finalise_List:
-84
         t = f[0]
-85
         Inverse_Doc_Frequency[f[0]]= math.log10((int(doc_fre))/N)
-86
     return(Inverse_Doc_Frequency)
-87
         
-88
-​
-89
+
 #TF * IDF MATRIX 
-90
 def TF_IDF_Matrix(Finalise_List):
-91
     TF_IDF={}
-92
     Final_Array= []
-93
     DF=Doc_freq(Finalise_List)
-94
     IDF=Inverse_Doc_Freq(DF)
-95
     #print(IDF)
-96
     for f in Finalise_List:
-97
         TF_IDF[f[0]] = f[2] * IDF[f[0]]
-98
         Final_Array.append([f[0],f[1],TF_IDF[f[0]]])
-99
         
-100
     return(Final_Array)
-101
+print("404")    
+import math
+#                       Helper Functions For Further Processsing 
+#                        Doc_Frequency
+​
+def Doc_frequency(q):
+    
+    Doc_Frequency = {}
+    check = 0 
+    for f in Finalise_List :
+#        print(f[0])
+        if f[0] ==  q :
+            check =check + 1
+ #           print(check)
+    return(check) 
+​
+​
+#Inverse_Doc_Frequency
+def Inverse_Doc_Frequency(doc_fre):
+    N = 56
+    Inverse_Doc_Frequency= math.log10((int(doc_fre))/N)
+    return(Inverse_Doc_Frequency)
+​
+def doc_list(word):
+    c = 0 
+    l=[]
+    
+    for i in doc :
+        for j in i:
+            if j == word :
+                l.append(1)
+                o = 1
+                break
+                
+        if 0 == 0 :
+            l.append(0)
+        o=0
+        c = c+1
+    return(l)    
+        
+def Term_Freq_Doc(term,doc_id):
+    i=0
+    list_f=[]
+    for f in doc:
+        if i== doc_id :
+            list_f = f 
+        i=i+1   
+    term_freq = Term_Frequency(list_f)       
+   # print(term_freq)
+   # y=term_freq[term]    
+    l=0
+    for i in term_freq :
+        if i == term :
+            l=term_freq[i]
+            break
+    return(l)
+​
+    
+def TF_IDF(tf,idf):
+    return(tf*idf)
+​
+​
+def Doc_freq(Finalise_List):
+    
+    Doc_Frequency = {}
+    check = 0 
+    for f in Finalise_List :
+        for i in Finalise_List :
+            if f[0] ==  i[0] :
+                check =check + 1
+                
+        Doc_Frequency[f[0]] = check 
+        check = 0
+         
+    
+    return(Doc_Frequency) 
+#IDF For Documents 
+​
+def Inverse_Doc_Freq(doc_fre):
+    Inverse_Doc_Frequency = {}
+    check = 0 
+#print(doc_fre)
+    N=56
+    for f in Finalise_List:
+        t = f[0]
+        Inverse_Doc_Frequency[f[0]]= math.log10((int(doc_fre))/N)
+    return(Inverse_Doc_Frequency)
+        
+​
+#TF * IDF MATRIX 
+def TF_IDF_Matrix(Finalise_List):
+    TF_IDF={}
+    Final_Array= []
+    DF=Doc_freq(Finalise_List)
+    IDF=Inverse_Doc_Freq(DF)
+    #print(IDF)
+    for f in Finalise_List:
+        TF_IDF[f[0]] = f[2] * IDF[f[0]]
+        Final_Array.append([f[0],f[1],TF_IDF[f[0]]])
+        
+    return(Final_Array)
 print("404")    
 404
-1
 ​
-1
 # Calculating the TF_IDF Score of Documents Here! 
-2
 # Helper Function 
-3
 def helper(i):
-4
     arr=[]
-5
     for word in total_unique_words:
-6
         x= Term_Freq_Doc(word,i)
-7
         z=Doc_frequency(word)
-8
         y=Inverse_Doc_Frequency(z)
-9
         v = x * y
-10
         arr.append(v)
-11
     return(arr)
-12
 ​
-13
 ​
-14
 #Calculating And Storing In File 
-15
 #This Take Time So File of TF_IDF Attached With Assignment  
-16
 x=56
-17
 ​
-18
 #with open('TF_IDF_SCORE_FDoc.txt',"w") as TF_IDF_SCORE:
-19
  #   for i in range(x):
-20
   #      print(i)
-21
    #     TF_IDF_SCORE.write('%s\n' % helper(i))
-22
     #    print(i)
-23
     
-24
 ​
-25
 ​
-26
 # Comment this code because Processed File is Attached Use this 
-27
     
-1
 ​
-1
 #                                      Loading the TF_IDF SCORE of documents from File 
-2
 with open('TF_IDF_SCORE_FDoc.txt',"r") as doc_score:
-3
     doc_S=[]
-4
     doc_S = doc_score.readlines()
-1
                         # Calculate the Magnitude of Vectors 
-2
 def Magnitude(doc_vec,query_vec):
-3
     check = 0
-4
     d_v=0
-5
     q_v=0
-6
     for i in range(len(doc_vec)):
-7
             x=doc_vec[check]
-8
             y=doc_vec[check]
-9
             d_v=d_v+math.pow(float(x),2)
-10
             q_v=q_v+math.pow(float(y),2)
-11
             check = check +1 
-12
             
-13
     return(math.sqrt(d_v) * math.sqrt(q_v) )
-14
                         # Filter  the Documents with Respect to Alpha Value 
-15
 def Refine(list, n):
-16
     newarray=[]
-17
     for i in list:
-18
         if i[1] > n:
-19
             newarray.append(i)
-20
     return(newarray)       
-21
                         # Sort The Documents With Respect to Cosin Similarity 
-22
 def Sorted_Documents(nlist):
-23
     for passnum in range(len(nlist)-1,0,-1):
-24
         for i in range(passnum):
-25
             x=nlist[i][1]
-26
             y=nlist[i+1][1]
-27
             if x < y :
-28
                 temp = nlist[i]
-29
                 nlist[i] = nlist[i+1]
-30
                 nlist[i+1]= temp      
-31
     l=[]
-32
     for i in nlist :
-33
         l.append(i[0])
-34
     return(l)
-35
                                 # Query Vector 
-36
 ​
-37
 def QueryVector(query):
-38
     lemmatizer = WordNetLemmatizer()
-39
     with open('Stopword-List.txt') as u : 
-40
         Stopwords = u.read().split()
-41
     query = query.split()
-42
     query = [word for word in query if word not in Stopwords]
-43
     query = [word.lower() for word in query]
-44
     query = [lemmatizer.lemmatize(word) for word in query]
-45
 ​
-46
     TF_ARRAY = []
-47
     res=[]
-48
     queryvector=[]
-49
     lenq=len(query)
-50
     for i in total_unique_words:
-51
         if lenq == 1 :
-52
             if i == query[0]:
-53
                 tf=Term_Frequency(query)
-54
                 queryvector.append( tf[query[0]] * Inverse_Doc_Frequency(Doc_frequency(query[0])))
-55
             else:
-56
                 queryvector.append(0)
-57
     
-58
             
-59
         elif lenq == 2 :
-60
             if i == query[0] or  i == query[1] :
-61
                 tf=Term_Frequency(query)
-62
                 if i== query[0] :
-63
                     queryvector.append( tf[query[0]] * Inverse_Doc_Frequency(Doc_frequency(query[0])))
-64
                 elif i== query[1]:
-65
                     queryvector.append( tf[query[1]] * Inverse_Doc_Frequency(Doc_frequency(query[1])))
-66
                     
-67
             else:
-68
                 queryvector.append(0)
-69
         
-70
         
-71
         elif lenq == 3 :
-72
             if i == query[0] or  i == query[1] or  i == query[2]:
-73
                 tf=Term_Frequency(query)
-74
                 if i== query[0] :
-75
                     queryvector.append( tf[query[0]] * Inverse_Doc_Frequency(Doc_frequency(query[0])))
-76
                 elif i== query[1]:
-77
                     queryvector.append( tf[query[1]] * Inverse_Doc_Frequency(Doc_frequency(query[1])))
-78
                 elif i== query[2]:
-79
                     queryvector.append( tf[query[2]] * Inverse_Doc_Frequency(Doc_frequency(query[2])))
-80
     
-81
             else:
-82
                 queryvector.append(0)    
-83
             
-84
         elif lenq == 4 :
-85
             if i == query[0] or  i == query[1] or  i == query[2]or  i == query[3]:
-86
                 tf=Term_Frequency(query)
-87
                 if i== query[0] :
-88
                     queryvector.append( tf[query[0]] * Inverse_Doc_Frequency(Doc_frequency(query[0])))
-89
                 elif i== query[1]:
-90
                     queryvector.append( tf[query[1]] * Inverse_Doc_Frequency(Doc_frequency(query[1])))
-91
                 elif i== query[2]:
-92
                     queryvector.append( tf[query[2]] * Inverse_Doc_Frequency(Doc_frequency(query[2])))
-93
                 elif i== query[3]:
-94
                     queryvector.append( tf[query[3]] * Inverse_Doc_Frequency(Doc_frequency(query[3])))
-95
             else:
-96
                 queryvector.append(0)
-97
             
-98
             
-99
         elif lenq == 5 :
-100
             if i == query[0] or  i == query[1]or  i == query[2] or  i == query[3] or  i == query[4] :
-101
                 tf=Term_Frequency(query)
-102
                 if i== query[0] :
-103
                     queryvector.append( tf[query[0]] * Inverse_Doc_Frequency(Doc_frequency(query[0])))
-104
                 elif i== query[1]:
-105
                     queryvector.append( tf[query[1]] * Inverse_Doc_Frequency(Doc_frequency(query[1])))
-106
                 elif i== query[2]:
-107
                     queryvector.append( tf[query[2]] * Inverse_Doc_Frequency(Doc_frequency(query[2])))
-108
                 elif i== query[3]:
-109
                     queryvector.append( tf[query[3]] * Inverse_Doc_Frequency(Doc_frequency(query[3])))
-110
                 elif i== query[4]:
-111
                     queryvector.append( tf[query[4]] * Inverse_Doc_Frequency(Doc_frequency(query[4])))
-112
             else:
-113
                 
-114
                 queryvector.append(0)
-115
             
-116
             
-117
         elif lenq == 6 :    
-118
             if i == query[0] or  i == query[1] or  i == query[2] or  i == query[3] or  i == query[4]or  i == query[5]:
-119
                 tf=Term_Frequency(query)
-120
                 if i== query[0] :
-121
                     queryvector.append( tf[query[0]] * Inverse_Doc_Frequency(Doc_frequency(query[0])))
-122
                 elif i== query[1]:
-123
                     queryvector.append( tf[query[1]] * Inverse_Doc_Frequency(Doc_frequency(query[1])))
-124
                 elif i== query[2]:
-125
                     queryvector.append( tf[query[2]] * Inverse_Doc_Frequency(Doc_frequency(query[2])))
-126
                 elif i== query[3]:
-127
                     queryvector.append( tf[query[3]] * Inverse_Doc_Frequency(Doc_frequency(query[3])))
-128
                 elif i== query[4]:
-129
                     queryvector.append( tf[query[4]] * Inverse_Doc_Frequency(Doc_frequency(query[4])))
-130
                 elif i== query[5]:
-131
                     queryvector.append( tf[query[5]] * Inverse_Doc_Frequency(Doc_frequency(query[5])))
-132
             else:
-133
                 queryvector.append(0)
-134
         
-135
         else:
-136
             print("Not In Range")
-137
     return(queryvector)
-138
 ​
-139
 ​
-140
 ​
-1
 ​
-1
 import math 
-2
 def QueryResult(query):
-3
     
-4
     queryvec= QueryVector(query) 
-5
 #Result Processing 
-6
     
-7
 #queryvec is Query Vector 
-8
 #doc_S is Documents Vector 
-9
     h = 0
-10
     p=0
-11
     g=0
-12
     d=0
-13
     Cosin_Similarity_Score = []
-14
     for i in doc_S :
-15
         d=d+1
-16
         x = re.sub("[^,-.-0-9]+","",i)
-17
         y=x.split(',')
-18
         b=0
-19
         p=0
-20
         q=0
-21
         #print(y)
-22
         for j in y:   
-23
             #print(queryvec[j])
-24
             z=float(j)
-25
             t= z * queryvec[b]
-26
             #print(queryvec[b])
-27
             b= b+1
-28
            # print(t)
-29
            # break
-30
             p = p+float(t)
-31
         
-32
        # print("p = ",p) 
-33
         q= p / Magnitude(y,queryvec)
-34
       #  print("q = ",q)
-35
         Cosin_Similarity_Score.append([g,q])
-36
      #   print(Cosin_Similarity_Score)
-37
         g=g+1
-38
     
-39
     #print(Cosin_Similarity_Score)
-40
     
-41
     list= Refine(Cosin_Similarity_Score,0.00005)   # Change The Value Of Alpha From Here ! 
-42
     #print(list)
-43
     V=Sorted_Documents(list)
-44
     return(V)
-45
 ​
-46
 ​
-47
 ​
-48
 ​
-49
 ​
-1
 ​
-1
 import math
-2
 ​
-3
 from tkinter import *
-4
 import tkinter.scrolledtext as tkst
-5
 #Graphical User Interphase for Assignment 
-6
 class GraphicalUserInterphase:
-7
 ​
-8
     def __init__(self, window):
-9
         self.window = window
-10
         self.window.configure(background = "slate blue")
-11
         self.Outline()
-12
         self.Buttons()
-13
         
-14
     def Outline(self):
-15
 ​
-16
         self.titleLabel = Label(self.window, text=" Information Retrieval Assignment 2 ", bg="lavender", font=("Helvetica", 24))
-17
         self.titleLabel.grid(row=1, column=2,pady=10)
-18
         self.titleLabel.grid(row=2, column=2,sticky='S',pady=10)
-19
         self.queryLabel = Label(self.window, text="Search Query", bg="lavender", font=("Helvetica", 18))
-20
         self.resultsLabel = Label(self.window, text="Results", bg="lavender", font=("Helvetica", 23))
-21
         self.queryEntry = Entry(self.window, width=40)
-22
         self.queryLabel.grid(row=3, column=1,pady=10,padx=5)
-23
         self.queryEntry.grid(row=3, column=2, sticky='W',ipady=5)
-24
         self.resultsLabel.grid(row=5, column=1,pady=20,padx=5)
-25
         self.textArea = tkst.ScrolledText(master=self.window, wrap = WORD, width = 60, height=15)
-26
         self.textArea.grid(row=7, column=0, columnspan=5)
-27
 ​
-28
     def Buttons(self):
-29
 ​
-30
         self.SearchBtn = Button(self.window, text="Search ", height=2, width=7 , command=self.Search)
-31
         self.SearchBtn.grid(row=4, column=2, sticky='W', padx=10, pady=10)
-32
         self.clearBtn = Button(self.window, text="Clear", height=2, width=7, command=self.Clear)
-33
         self.clearBtn.grid(row=4, column=2, padx=10, pady=10)
-34
         
-35
     def Search(self):
-36
         query = self.queryEntry.get()
-37
         result =  QueryResult(query)
-38
         
-39
         if (len(result) == 0):
-40
             self.textArea.insert(INSERT, "Empty Result set  " + query + "\n")
-41
         else:
-42
             self.textArea.insert(INSERT, "Query: " + query + "\n" + str(result) + "\n")
-43
     def Clear(self):
-44
         self.textArea.delete('1.0', END)
-45
         self.queryEntry.delete("0", END)
-46
 ​
-47
 window = Tk()
-48
 ​
-49
 window.title("k173934 Information Retrieval Assignment 2 ")
-50
 obj = GraphicalUserInterphase(window)
-51
 window.mainloop()
-1
 ​
-1
 ​
